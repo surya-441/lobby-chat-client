@@ -5,14 +5,13 @@ import { socket } from "../services/socket";
 
 const ChatScreen = () => {
     const [messages, setMessages] = React.useState<IMessage[]>([]);
-
     useEffect(() => {
         socket.on(
             "chat_message",
-            ({ from, text }: { from: string; text: string }) => {
+            ({ from, message }: { from: string; message: string }) => {
                 const incoming: IMessage = {
                     _id: Date.now(),
-                    text,
+                    text: message,
                     createdAt: new Date(),
                     user: { _id: from } as User,
                 };
@@ -26,6 +25,7 @@ const ChatScreen = () => {
     }, []);
 
     const onSend = useCallback((newMessages: IMessage[] = []) => {
+        console.log(newMessages);
         const [first] = newMessages;
         if (first && first.text) {
             socket.emit("chat_message", first.text);
