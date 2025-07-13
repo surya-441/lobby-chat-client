@@ -20,14 +20,6 @@ const ChatScreen = ({ route }: Props) => {
     }, [navigation, lobbyId]);
 
     useEffect(() => {
-        socket.emit("join_lobby", { lobbyId }, (response) => {
-            if (response.error) {
-                console.error("Failed to join lobby: ", response.error);
-            } else {
-                console.log(`Joined lobby ${lobbyId}`);
-            }
-        });
-
         socket.on(
             "chat_message",
             ({ from, text }: { from: string; text: string }) => {
@@ -41,8 +33,24 @@ const ChatScreen = ({ route }: Props) => {
             }
         );
 
+        socket.on(
+            "participant_left",
+            ({ leavingParticipant }: { leavingParticipant: string }) => {
+                const message: IMessage = {
+                    _id: Date.now().toString(),
+                    text: `${leavingParticipant} has left the lobby`,
+                    createdAt: new Date(),
+                    user: { _id: "system" },
+                    system: true,
+                };
+                setMessages((prev) => [message, ...prev]);
+            }
+        );
+
         return () => {
+            console.log("disconnecting...");
             socket.off("chat_message");
+            socket.disconnect();
         };
     }, [lobbyId]);
 

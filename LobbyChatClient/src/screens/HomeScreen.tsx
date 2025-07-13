@@ -32,11 +32,9 @@ const HomeScreen = ({ navigation }: Props) => {
             navigation.navigate("Chat", { lobbyId });
         });
 
-        socket.on("error", (msg: string) => {});
-
         return () => {
             socket.off("lobby_created");
-            socket.off("lobby_created");
+            socket.off("lobby_joined");
         };
     }, [navigation]);
 

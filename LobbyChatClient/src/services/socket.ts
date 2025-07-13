@@ -6,7 +6,7 @@ export interface ServerToClientEvents {
     lobby_created: (data: { lobbyId: string }) => void;
     lobby_joined: (data: { lobbyId: string; participants: string[] }) => void;
     chat_message: (data: { from: string; text: string }) => void;
-    error: (message: string) => void;
+    participant_left: (data: { leavingParticipant: string }) => void;
 }
 
 export interface ClientToServerEvents {
