@@ -62,7 +62,10 @@ const HomeScreen = ({ navigation }: Props) => {
             if (response.error) {
                 Alert.alert("Failed to create a lobby.", response.error);
             } else if (response.lobbyId) {
-                navigation.navigate("Chat", { lobbyId: response.lobbyId });
+                navigation.navigate("Chat", {
+                    lobbyId: response.lobbyId,
+                    title: response.lobbyId,
+                });
             }
         });
     };
@@ -80,7 +83,10 @@ const HomeScreen = ({ navigation }: Props) => {
             if (response.error) {
                 Alert.alert("Failed to join the lobby", response.error);
             } else if (response.lobbyId) {
-                navigation.navigate("Chat", { lobbyId: response.lobbyId });
+                navigation.navigate("Chat", {
+                    lobbyId: response.lobbyId,
+                    title: response.lobbyId,
+                });
             }
         });
     };

@@ -1,15 +1,23 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useLayoutEffect } from "react";
 import { Text, View } from "react-native";
 import { GiftedChat, IMessage, User } from "react-native-gifted-chat";
 import { socket } from "../services/socket";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
+import { useNavigation } from "@react-navigation/native";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Chat">;
 
 const ChatScreen = ({ route }: Props) => {
     const { lobbyId } = route.params;
     const [messages, setMessages] = React.useState<IMessage[]>([]);
+    const navigation = useNavigation();
+
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: `Lobby ID: ${lobbyId}`,
+        });
+    }, [navigation, lobbyId]);
 
     useEffect(() => {
         socket.emit("join_lobby", { lobbyId }, (response) => {
