@@ -16,7 +16,7 @@ import { socket } from "../services/socket";
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 const HomeScreen = ({ navigation }: Props) => {
-    const [maxPlayers, setMaxPlayers] = useState<string>("4");
+    const [maxPlayers, setMaxPlayers] = useState<string>("");
     const [joinCode, setJoinCode] = useState<string>("");
     const [creating, setCreating] = useState<boolean>(false);
     const [joining, setJoining] = useState<boolean>(false);
