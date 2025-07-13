@@ -7,6 +7,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     StyleSheet,
+    Switch,
     Text,
     TextInput,
     View,
@@ -19,6 +20,8 @@ type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
 const HomeScreen = ({ navigation }: Props) => {
     const [maxPlayers, setMaxPlayers] = useState<string>("");
+    const [maxAI, setMaxAI] = useState<string>("");
+    const [isPrivate, setIsPrivate] = useState<boolean>(false);
     const [joinCode, setJoinCode] = useState<string>("");
     const [creating, setCreating] = useState<boolean>(false);
     const [joining, setJoining] = useState<boolean>(false);
@@ -53,8 +56,10 @@ const HomeScreen = ({ navigation }: Props) => {
     console.log(lobbies);
 
     const handleCreate = () => {
-        const max = parseInt(maxPlayers, 10);
-        if (isNaN(max) || max <= 0) {
+        const maxPlayersCount = parseInt(maxPlayers, 10);
+        const maxAICount = parseInt(maxAI, 10);
+
+        if (isNaN(maxPlayersCount) || maxPlayersCount <= 0) {
             Alert.alert(
                 "Invalid Input",
                 "Max players must be a number greater than 0!"
@@ -63,16 +68,20 @@ const HomeScreen = ({ navigation }: Props) => {
         }
 
         setCreating(true);
-        socket.emit("create_lobby", max, (response) => {
-            setCreating(false);
-            if (response.error) {
-                Alert.alert("Failed to create a lobby.", response.error);
-            } else if (response.lobbyId) {
-                navigation.navigate("Chat", {
-                    lobbyId: response.lobbyId,
-                });
+        socket.emit(
+            "create_lobby",
+            { maxPlayers: maxPlayersCount, maxAI: maxAICount, isPrivate },
+            (response) => {
+                setCreating(false);
+                if (response.error) {
+                    Alert.alert("Failed to create a lobby.", response.error);
+                } else if (response.lobbyId) {
+                    navigation.navigate("Chat", {
+                        lobbyId: response.lobbyId,
+                    });
+                }
             }
-        });
+        );
     };
 
     const handleJoin = () => {
@@ -102,6 +111,7 @@ const HomeScreen = ({ navigation }: Props) => {
         >
             {lobbies.length > 0 && (
                 <View style={styles.section}>
+                    <Text style={styles.heading}>Public Lobbies</Text>
                     <LobbyTable lobbies={lobbies} />
                 </View>
             )}
@@ -114,6 +124,20 @@ const HomeScreen = ({ navigation }: Props) => {
                     onChangeText={setMaxPlayers}
                     placeholder="Max players (e.g. 4)"
                 />
+                <TextInput
+                    style={styles.input}
+                    keyboardType="number-pad"
+                    value={maxAI}
+                    onChangeText={setMaxAI}
+                    placeholder="AI Bot count upto 2"
+                />
+                <View style={{ flexDirection: "row", paddingBottom: 8 }}>
+                    <Text style={styles.label}>Private</Text>
+                    <Switch
+                        value={isPrivate}
+                        onValueChange={() => setIsPrivate((prev) => !prev)}
+                    />
+                </View>
                 <Button
                     title={creating ? "Creating..." : "Create Lobby"}
                     onPress={handleCreate}
@@ -155,5 +179,9 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 4,
         marginBottom: 12,
+    },
+    label: {
+        marginRight: 8,
+        fontSize: 16,
     },
 });

@@ -13,7 +13,11 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
     create_lobby: (
-        maxPlayers: number,
+        {
+            maxPlayers,
+            maxAI,
+            isPrivate,
+        }: { maxPlayers: number; maxAI: number; isPrivate: boolean },
         callback: (response: { error?: string; lobbyId?: string }) => void
     ) => void;
     join_lobby: (

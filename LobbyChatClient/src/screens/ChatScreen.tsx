@@ -50,7 +50,7 @@ const ChatScreen = ({ route }: Props) => {
         return () => {
             console.log("disconnecting...");
             socket.off("chat_message");
-            socket.disconnect();
+            // socket.disconnect();
         };
     }, [lobbyId]);
 
