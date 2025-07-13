@@ -4,14 +4,16 @@ import { RootStackParamList } from "../../App";
 import {
     Alert,
     Button,
+    KeyboardAvoidingView,
     Platform,
     StyleSheet,
     Text,
     TextInput,
     View,
 } from "react-native";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { socket } from "../services/socket";
+import { LobbyList } from "../types/LobbyList";
+import LobbyTable from "../components/LobbyTable";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
@@ -20,6 +22,7 @@ const HomeScreen = ({ navigation }: Props) => {
     const [joinCode, setJoinCode] = useState<string>("");
     const [creating, setCreating] = useState<boolean>(false);
     const [joining, setJoining] = useState<boolean>(false);
+    const [lobbies, setLobbies] = useState<LobbyList[]>([]);
 
     useEffect(() => {
         socket.on("lobby_created", ({ lobbyId }: { lobbyId: string }) => {
@@ -35,8 +38,19 @@ const HomeScreen = ({ navigation }: Props) => {
         return () => {
             socket.off("lobby_created");
             socket.off("lobby_joined");
+            socket.off("lobby_list");
         };
     }, [navigation]);
+
+    useEffect(() => {
+        socket.emit("get_lobbies");
+        socket.on("lobby_list", (data: LobbyList[]) => {
+            setLobbies(data);
+        });
+    }, []);
+
+    // socket.emit("get_lobbies");
+    console.log(lobbies);
 
     const handleCreate = () => {
         const max = parseInt(maxPlayers, 10);
@@ -86,6 +100,11 @@ const HomeScreen = ({ navigation }: Props) => {
             style={styles.container}
             behavior={Platform.select({ ios: "padding" })}
         >
+            {lobbies.length > 0 && (
+                <View style={styles.section}>
+                    <LobbyTable lobbies={lobbies} />
+                </View>
+            )}
             <View style={styles.section}>
                 <Text style={styles.heading}>Create a Lobby</Text>
                 <TextInput

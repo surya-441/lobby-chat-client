@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { LobbyList } from "../types/LobbyList";
 
 export interface ServerToClientEvents {
     connect: () => void;
@@ -7,6 +8,7 @@ export interface ServerToClientEvents {
     lobby_joined: (data: { lobbyId: string; participants: string[] }) => void;
     chat_message: (data: { from: string; text: string }) => void;
     participant_left: (data: { leavingParticipant: string }) => void;
+    lobby_list: (data: LobbyList[]) => void;
 }
 
 export interface ClientToServerEvents {
@@ -23,6 +25,7 @@ export interface ClientToServerEvents {
         }) => void
     ) => void;
     chat_message: (data: { lobbyId: string; text: string }) => void;
+    get_lobbies: () => void;
 }
 
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
