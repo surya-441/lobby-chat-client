@@ -6,7 +6,7 @@ import ChatScreen from "./src/screens/ChatScreen";
 
 export type RootStackParamList = {
     Home: undefined;
-    Chat: undefined;
+    Chat: { lobbyId: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

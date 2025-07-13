@@ -8,43 +8,55 @@ import { RootStackParamList } from "../../App";
 type Props = NativeStackScreenProps<RootStackParamList, "Chat">;
 
 const ChatScreen = ({ route }: Props) => {
-  const [messages, setMessages] = React.useState<IMessage[]>([]);
+    const { lobbyId } = route.params;
+    const [messages, setMessages] = React.useState<IMessage[]>([]);
 
-  useEffect(() => {
-    socket.on(
-      "chat_message",
-      ({ from, message }: { from: string; message: string }) => {
-        const incoming: IMessage = {
-          _id: Date.now(),
-          text: message,
-          createdAt: new Date(),
-          user: { _id: from } as User,
+    useEffect(() => {
+        socket.emit("join_lobby", { lobbyId }, (response) => {
+            if (response.error) {
+                console.error("Failed to join lobby: ", response.error);
+            } else {
+                console.log(`Joined lobby ${lobbyId}`);
+            }
+        });
+
+        socket.on(
+            "chat_message",
+            ({ from, text }: { from: string; text: string }) => {
+                const incoming: IMessage = {
+                    _id: Date.now().toString(),
+                    text,
+                    createdAt: new Date(),
+                    user: { _id: from } as User,
+                };
+                setMessages((prev) => [incoming, ...prev]);
+            }
+        );
+
+        return () => {
+            socket.off("chat_message");
         };
-        setMessages((prev) => [incoming, ...prev]);
-      }
+    }, [lobbyId]);
+
+    const onSend = useCallback((newMessages: IMessage[] = []) => {
+        if (newMessages.length === 0) return;
+
+        console.log(newMessages);
+
+        const [firstMessage] = newMessages;
+
+        socket.emit("chat_message", { lobbyId, text: firstMessage.text });
+
+        setMessages((prev) => GiftedChat.append(prev, [firstMessage]));
+    }, []);
+
+    return (
+        <GiftedChat
+            messages={messages}
+            onSend={(msgs) => onSend(msgs)}
+            user={{ _id: "me" } as User}
+        />
     );
-
-    return () => {
-      socket.off("chat_message");
-    };
-  }, []);
-
-  const onSend = useCallback((newMessages: IMessage[] = []) => {
-    console.log(newMessages);
-    const [first] = newMessages;
-    if (first && first.text) {
-      socket.emit("chat_message", first.text);
-      setMessages((prev) => [...newMessages, ...prev]);
-    }
-  }, []);
-
-  return (
-    <GiftedChat
-      messages={messages}
-      onSend={(msgs) => onSend(msgs)}
-      user={{ _id: "me" } as User}
-    />
-  );
 };
 
 export default ChatScreen;
