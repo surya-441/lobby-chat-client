@@ -15,12 +15,6 @@ import { socket } from "../services/socket";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Home">;
 
-interface Lobby {
-    code: string;
-    name: string;
-    participants: number;
-}
-
 const HomeScreen = ({ navigation }: Props) => {
     const [maxPlayers, setMaxPlayers] = useState<string>("4");
     const [joinCode, setJoinCode] = useState<string>("");
@@ -64,7 +58,6 @@ const HomeScreen = ({ navigation }: Props) => {
             } else if (response.lobbyId) {
                 navigation.navigate("Chat", {
                     lobbyId: response.lobbyId,
-                    title: response.lobbyId,
                 });
             }
         });
@@ -85,7 +78,6 @@ const HomeScreen = ({ navigation }: Props) => {
             } else if (response.lobbyId) {
                 navigation.navigate("Chat", {
                     lobbyId: response.lobbyId,
-                    title: response.lobbyId,
                 });
             }
         });
