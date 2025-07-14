@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect } from "react";
-import { Text, View } from "react-native";
-import { GiftedChat, IMessage, User } from "react-native-gifted-chat";
+import { StyleSheet, Text, View } from "react-native";
+import { Avatar, GiftedChat, IMessage, User } from "react-native-gifted-chat";
 import { socket } from "../services/socket";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
@@ -71,8 +71,46 @@ const ChatScreen = ({ route }: Props) => {
             messages={messages}
             onSend={(msgs) => onSend(msgs)}
             user={{ _id: "me" } as User}
+            showAvatarForEveryMessage
+            renderAvatar={(props) => {
+                if (props.currentMessage.user.avatar) {
+                    return (
+                        <Avatar
+                            {...props}
+                            imageStyle={{
+                                left: { borderRadius: 20 },
+                                right: { borderRadius: 20 },
+                            }}
+                        />
+                    );
+                }
+                const letter = String(props.currentMessage.user._id)
+                    .charAt(0)
+                    .toUpperCase();
+                console.log("The letter is: ", letter);
+                return (
+                    <View style={styles.avatar}>
+                        <Text style={styles.letter}>{letter}</Text>
+                    </View>
+                );
+            }}
         />
     );
 };
 
 export default ChatScreen;
+
+const styles = StyleSheet.create({
+    avatar: {
+        backgroundColor: "#4F6D7A",
+        height: 32,
+        width: 32,
+        borderRadius: 20,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    letter: {
+        color: "#FFF",
+        fontWeight: "600",
+    },
+});
