@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useLayoutEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Avatar, GiftedChat, IMessage, User } from "react-native-gifted-chat";
-import { socket } from "../services/socket";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../App";
 import { useNavigation } from "@react-navigation/native";
+import { AITypes } from "../types/aiTypes";
+import { socket } from "../services/socket";
+import { RootStackParamList } from "../../App";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Chat">;
 
@@ -84,13 +85,12 @@ const ChatScreen = ({ route }: Props) => {
                         />
                     );
                 }
-                const letter = String(props.currentMessage.user._id)
-                    .charAt(0)
-                    .toUpperCase();
-                console.log("The letter is: ", letter);
+                const id = String(props.currentMessage.user._id);
+                const letter = id.charAt(0).toUpperCase();
+                const ai: boolean = AITypes.includes(id);
                 return (
                     <View style={styles.avatar}>
-                        <Text style={styles.letter}>{letter}</Text>
+                        <Text style={styles.letter}>{ai ? "AI" : letter}</Text>
                     </View>
                 );
             }}
